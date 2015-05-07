@@ -56,14 +56,14 @@ on to_chrome()
 									end if
 								end ignoring
 							on error err_msg number err_num
-								if err_num ­ -2753 then -- not defined.
+								if err_num â‰  -2753 then -- not defined.
 									log "Rerasing: " & err_msg & " " & err_msg
 									error err_msg number err_num
 								end if
 							end try
 						end repeat
 					on error err_msg number err_num
-						if err_num ­ -1728 then -- errAENoSuchObject
+						if err_num â‰  -1728 then -- errAENoSuchObject
 							log "Rerasing: " & err_msg & " " & err_num
 							error err_msg number err_num
 						end if
@@ -81,6 +81,14 @@ on to_chrome()
 	if length of m_urls > 0 then
 		tell application "Google Chrome"
 			activate
+			
+			-- Some extension which live in their own windows cause problems with activate;
+			-- normally we get a window when we activate Chrome but not if an extension is 
+			-- running in its own window. That window however, doesn't appear to count 
+			-- towards the total number of windos.
+			if (count windows) is 0 then
+				make new window
+			end if
 			
 			repeat with m_url in m_urls
 				ignoring case
